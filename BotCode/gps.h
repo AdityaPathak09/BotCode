@@ -1,8 +1,8 @@
 #include <SoftwareSerial.h>
 #include <TinyGPS.h>
 
-#define gpsRX 16
-#define gpsTX 17
+#define gpsRX 35 //16
+#define gpsTX 4 //17
 
 
 TinyGPS gps;
@@ -14,8 +14,8 @@ String getGps(float * latitude, float * longitude)
     String string;
     while (gpsSerial.available())
     {
-//     Serial.print((char)gpsSerial.read());
-//     string = string + (char) gps.encode(gpsSerial.read());
+    // Serial.print((char)gpsSerial.read());
+    // string = string + (char) gps.encode(gpsSerial.read());
       gps.encode(gpsSerial.read());
     }
     gps.f_get_position(latitude, longitude, &age);

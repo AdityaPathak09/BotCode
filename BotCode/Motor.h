@@ -3,23 +3,17 @@
 #define motorrf 1
 #define motorlb 2
 #define motorrb 3
-#define motorbeup 4
-#define motorbedown 5
-#define motorbcup 6
-#define motorbcdown 7
-#define servoCam 8
+#define servobe 4
+#define servobc 5
+#define servoCam 6
 
 #define motorPinlf 13 // pins 2, 4
 #define motorPinlb 14
 #define motorPinrf 27
 #define motorPinrb 26
-#define motorPinbeup 25
-#define motorPinbedown 33
-#define motorPinbcup 32
-#define motorPinbcdown 23
+#define servoPinBackE 25
+#define servoPinBackC 33
 #define servoPincam 15
-#define actpote 35
-#define actpotc 34
 #define pump1 5
 #define pump2 18
 
@@ -96,46 +90,16 @@ void setCam(int angle)
 
 void setSprayerCentreHeight(int height)
 {
-  int potval = map(height, 0, 127, 0, 255); // convert height to 12 bit value
-
-  if (analogRead(actpotc) < potval)
-  {
-    while (analogRead(actpotc) < potval)
-    {
-      ledcWrite(motorbcup, offsetspeed);
-      ledcWrite(motorbcdown, 0);
-    }
-  }
-  else if (analogRead(actpotc) > potval)
-  {
-    while (analogRead(actpotc) > potval)
-    {
-      ledcWrite(motorbcup, 0);
-      ledcWrite(motorbcdown, offsetspeed);
-    }
-  }
+  height = map(height, 0, 180, servoMinDS, servoMaxDS);
+  ledcWrite(servobc, height); 
+  delay(15);
 }
 
 void setSprayerEdgeHeight(int height)
 {
-  int potval = map(height, 0, 127, 0, 255); // convert height to 12 bit value
-
-  if (analogRead(actpote) < potval)
-  {
-    while (analogRead(actpote) < potval)
-    {
-      ledcWrite(motorbeup, offsetspeed);
-      ledcWrite(motorbedown, 0);
-    }
-  }
-  else if (analogRead(actpote) > potval)
-  {
-    while (analogRead(actpote) > potval)
-    {
-      ledcWrite(motorbeup, 0);
-      ledcWrite(motorbedown, offsetspeed);
-    }
-  }
+  height = map(height, 0, 180, servoMinDS, servoMaxDS);
+  ledcWrite(servobe, height);
+  delay(15);
 }
 
 void setPump(int pump, boolean state)
@@ -149,10 +113,8 @@ void setMotors()
   pinMode(motorPinrf, OUTPUT);
   pinMode(motorPinlb, OUTPUT);
   pinMode(motorPinrb, OUTPUT);
-  pinMode(motorPinbeup, OUTPUT);
-  pinMode(motorPinbedown, OUTPUT);
-  pinMode(motorPinbcup, OUTPUT);
-  pinMode(motorPinbcdown, OUTPUT);
+  pinMode(servoPinBackE, OUTPUT);
+  pinMode(servoPinBackC, OUTPUT);
   pinMode(servoPincam, OUTPUT);
   pinMode(pump1, OUTPUT);
   pinMode(pump2, OUTPUT);
@@ -161,25 +123,23 @@ void setMotors()
   ledcSetup(motorrf, freq, resMotor);
   ledcSetup(motorlb, freq, resMotor);
   ledcSetup(motorrb, freq, resMotor);
-  ledcSetup(motorPinbeup, freq, resMotor);
-  ledcSetup(motorPinbedown, freq, resMotor);
-  ledcSetup(motorbcup, freq, resMotor);
-  ledcSetup(motorbcdown, freq, resMotor);
+  ledcSetup(servobc, freq, resMotor);
+  ledcSetup(servobe, freq, resMotor);
   ledcSetup(servoCam, freq, resServo);
 
   ledcAttachPin(motorPinlf, motorlf);
   ledcAttachPin(motorPinrf, motorrf);
   ledcAttachPin(motorPinlb, motorlb);
   ledcAttachPin(motorPinrb, motorrb);
-  ledcAttachPin(motorPinbeup, motorbeup);
-  ledcAttachPin(motorPinbedown, motorbedown);
-  ledcAttachPin(motorPinbcup, motorbcup);
-  ledcAttachPin(motorPinbcdown, motorbcdown);
+  ledcAttachPin(servoPinBackC, servobc);
+  ledcAttachPin(servoPinBackE, servobe);
   ledcAttachPin(servoPincam, servoCam);
 
 // setSprayerCentreHeight(64);
 // setSprayerEdgeHeight(64);
   setCam(90);
+  setSprayerCentreHeight(180);
+  setSprayerEdgeHeight(180);
 
   setPump(pump1, HIGH);
   setPump(pump2, HIGH);
