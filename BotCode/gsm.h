@@ -63,7 +63,7 @@ void setGSM()
       // updateSerial();
       // gsmSerial.println("AT+CLBS=1,1"); //Signal quality test, value range is 0-31 , 31 is the best
       // updateSerial();
-
+ 
       gsmSerial.println("AT+CMGF=1"); //Signal quality test, value range is 0-31 , 31 is the best
       updateSerial();
       gsmSerial.print("AT+CMGS=\"+917507927015\""); //Read SIM information to confirm whether the SIM is plugged
@@ -78,5 +78,8 @@ void setGSM()
       
       gsmSerial.println("ATS0=1"); //Check whether it has registered in the network
       updateSerial();
+
+      
+      Serial.println("GSM Set");
 }
 

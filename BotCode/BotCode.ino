@@ -2,6 +2,15 @@
 #include <BluetoothSerial.h>
 BluetoothSerial bluetooth;
 
+// Software Serial ////////////////////////////////////////////////////////////////
+// for communication between camera and controller
+#include <SoftwareSerial.h>
+
+#define RX_PIN 12  //not used
+#define TX_PIN 19
+
+SoftwareSerial mySerial(RX_PIN, TX_PIN);
+
 // Motor Library///////////////////////////////////////////////////////////////////
 #include "Motor.h"
 
@@ -24,6 +33,8 @@ byte latitudeArr[5];
 byte longitudeArr[5];
 byte compassHeadArr[3];
 
+
+int ip_address_of_flask_server[4];
 // pinMap ////////////////////////////////////////////////////////////////////////
 #define camTrig 19
 
@@ -49,25 +60,25 @@ byte compassHeadArr[3];
 // }
 // Main Coding /////////////////////////////////////////////////////////////////
 
-void sendGpsData()
-{
+void sendGpsData() {
+  Serial.println("Started Getting");
   getGps(&latitude, &longitude);
+  Serial.println("got GPS");
   getCompass(&compassHead);
-  // Serial.println("Comass:" +String(compassHead));
+  Serial.println("Comass:" + String(compassHead));
 
   long lat = long(latitude * 10000000.0);
   long lon = long(longitude * 10000000.0);
   long compH = long(compassHead * 100.0);
 
-  // Serial.print("    ");
-  // Serial.print(lat);
-  // Serial.print(" ");
-  // Serial.print(lon);
-  // Serial.print(" ");
-  // Serial.println(compH);
+  Serial.print("    ");
+  Serial.print(lat);
+  Serial.print(" ");
+  Serial.print(lon);
+  Serial.print(" ");
+  Serial.println(compH);
 
-  for (int i = 0; i < 5; i++)
-  {
+  for (int i = 0; i < 5; i++) {
     latitudeArr[i] = byte(lat % 100);
     longitudeArr[i] = byte(lon % 100);
 
@@ -79,31 +90,27 @@ void sendGpsData()
     lon = lon / 100;
   }
 
-  for (int i = 0; i < 3; i++)
-  {
+  for (int i = 0; i < 3; i++) {
     compassHeadArr[i] = byte(compH % 100);
     // // Serial.println(compassHeadArr[i]);
     compH = compH / 100;
   }
 
-  for (int i = 4; i >= 0; i--)
-  {
+  for (int i = 4; i >= 0; i--) {
     // // Serial.print(latitudeArr[i]);
     bluetooth.write(latitudeArr[i]);
   }
   // // Serial.println();
 
   delay(100);
-  for (int i = 4; i >= 0; i--)
-  {
+  for (int i = 4; i >= 0; i--) {
     // // Serial.print(longitudeArr[i]);
     bluetooth.write(longitudeArr[i]);
   }
   // Serial.println();
 
   delay(100);
-  for (int i = 2; i >= 0; i--)
-  {
+  for (int i = 2; i >= 0; i--) {
     // Serial.print(compassHeadArr[i]);
     bluetooth.write(compassHeadArr[i]);
   }
@@ -111,99 +118,130 @@ void sendGpsData()
   // // Serial.println("data sent");
 }
 
-byte getInstruction()
-{
+byte getInstruction() {
   byte instruction = 0;
   int charector = 0;
 
-  while (bluetooth.available())
-  {
+  while (bluetooth.available()) {
     instruction = bluetooth.read();
     charector = bluetooth.read();
 
     Serial.println("Instruction: " + String(instruction) + "Speed: " + String(charector));
 
-    switch (instruction)
-    {
-    case 1:
-      forward(charector);
-      break;
-    case 2:
-      backard(charector);
-      break;
-    case 3:
-      leftTurn(charector);
-      break;
-    case 4:
-      rightTurn(charector);
-      break;
-    case 5:
-      leftSpin(charector);
-      break;
-    case 6:
-      rightSpin(charector);
-      break;
-    case 7:
-      stopMotors();
-      break;
-    case 8:
-      setCam(charector);
-      Serial.println(charector);
-      break;
-    case 9:
-      Serial.println("Sending data");
-      // Serial.println(String(compassHead));
-      sendGpsData();
-      break;
-    case 10:
-      if (charector == 1)
-        setPump(pump1, LOW);
-      else
-        setPump(pump1, HIGH);
-      break;
-    case 11:
-      if (charector == 1)
-        setPump(pump2, LOW);
-      else
-        setPump(pump2, HIGH);
-      break;
-    case 12:
-      setSprayerCentreHeight(charector);
-      break;
-    case 13:
-      setSprayerEdgeHeight(charector);
-      break;
-    case 14:
-      digitalWrite(camTrig, LOW);
-      delay(250);
-      digitalWrite(camTrig, HIGH);
-      break;
-    default:
-      instruction = 0;
-      stopMotors();
-      break;
+    switch (instruction) {
+      case 1:
+        forward(charector);
+        break;
+      case 2:
+        backard(charector);
+        break;
+      case 3:
+        leftTurn(charector);
+        break;
+      case 4:
+        rightTurn(charector);
+        break;
+      case 5:
+        leftSpin(charector);
+        break;
+      case 6:
+        rightSpin(charector);
+        break;
+      case 7:
+        stopMotors();
+        break;
+      case 8:
+        setCam(charector);
+        Serial.println(charector);
+        break;
+      case 9:
+        Serial.println("Sending data");
+        // Serial.println(String(compassHead));
+        sendGpsData();
+        break;
+      case 10:
+        if (charector == 1)
+          setPump(pump1, LOW);
+        else
+          setPump(pump1, HIGH);
+        break;
+      case 11:
+        if (charector == 1)
+          setPump(pump2, LOW);
+        else
+          setPump(pump2, HIGH);
+        break;
+      case 12:
+        setSprayerCentreHeight(charector);
+        break;
+      case 13:
+        setSprayerEdgeHeight(charector);
+        break;
+      case 14:
+        digitalWrite(camTrig, LOW);
+        delay(1200);
+        digitalWrite(camTrig, HIGH);
+        break;
+      case 15:
+        ip_address_of_flask_server[0] = charector;
+        break;
+      case 16:
+        ip_address_of_flask_server[1] = charector;
+        break;
+      case 17:
+        ip_address_of_flask_server[2] = charector;
+        break;
+      case 18:
+        ip_address_of_flask_server[3] = charector;
+        // String ip = String(ip_address_of_flask_server[0]) + "." + String(ip_address_of_flask_server[1]) + "." + String(ip_address_of_flask_server[2]) + "." + String(ip_address_of_flask_server[3]));
+        // Serial.println(ip);
+
+
+        mySerial.begin(9600);
+
+        mySerial.println("Dummy");  // Send the integer value via SoftwareSerial
+        delay(100);
+        mySerial.println(ip_address_of_flask_server[0] + 255);  // Send the integer value via SoftwareSerial
+        delay(10);
+        mySerial.println(ip_address_of_flask_server[1] + 255);  // Send the integer value via SoftwareSerial
+        delay(10);
+        mySerial.println(ip_address_of_flask_server[2] + 255);  // Send the integer value via SoftwareSerial
+        delay(10);
+        mySerial.println(ip_address_of_flask_server[3] + 255);  // Send the integer value via SoftwareSerial
+
+        mySerial.end();
+
+        pinMode(camTrig, OUTPUT);
+
+        digitalWrite(camTrig, HIGH);
+
+        break;
+
+      default:
+        instruction = 0;
+        stopMotors();
+        break;
     }
   }
   return instruction;
 }
 
-void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
-{
-   if(event == ESP_SPP_SRV_OPEN_EVT){
+void callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param) {
+  if (event == ESP_SPP_SRV_OPEN_EVT) {
     Serial.println("Client Connected");
   }
- 
-  if(event == ESP_SPP_CLOSE_EVT ){
+
+  if (event == ESP_SPP_CLOSE_EVT) {
     stopMotors();
     Serial.println("Client disconnected");
   }
 }
 
-void setup()
-{
+void setup() {
   pinMode(camTrig, OUTPUT);
   digitalWrite(camTrig, HIGH);
   Serial.begin(115200);
+
   bluetooth.begin("pestRobo");
 
   bluetooth.register_callback(callback);
@@ -213,19 +251,16 @@ void setup()
   // pinMode(2, OUTPUT);
   // attachInterrupt(34, ISR, HIGH);
 
-  
+
   setMotors();
   setGPS();
   setCompass();
   setGSM();
 }
 
-void loop()
-{
+void loop() {
   getInstruction();
   updateSerial();
-  //  getGps();
-  //  sendGpsData();
-  //  getCompass(&compassHead);
-  //  Serial.println(String(compassHead));
+
+  // sendGpsData();
 }

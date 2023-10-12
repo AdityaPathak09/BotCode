@@ -143,4 +143,6 @@ void setMotors()
 
   setPump(pump1, HIGH);
   setPump(pump2, HIGH);
+
+  Serial.println("Motors Set");
 }

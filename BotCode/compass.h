@@ -1,44 +1,40 @@
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_HMC5883_U.h>
+#include <QMC5883LCompass.h>
 
-float compassOffset = 260.29;
+QMC5883LCompass compass;
 
-Adafruit_HMC5883_Unified compass = Adafruit_HMC5883_Unified(108);
+float compassOffset = 0;
 
 void setCompass()
 {
-    long tim = millis();
-    while(compass.begin()){
-        if(millis() - tim >= 3000){
-            Serial.println("Compass Not Set");
-            break;
-        }
-    }
-    
+  compass.init();
+  Serial.println("Compass Set");
 }
 
 void getCompass(float *heading)
 {
-    sensors_event_t event;
-    compass.getEvent(&event);
 
-    *heading = atan2(event.magnetic.y, event.magnetic.x);
+  compass.read();
 
-    if (*heading < 0)
-        *heading += 2 * PI;
+  int a = compass.getAzimuth();
 
-    if (*heading > 2 * PI)
-        *heading -= 2 * PI;
+  if (a < 0){
+    a = 360 + a;  
+  }
 
-    float headingDegrees = *heading * 180 / M_PI;
-
-    *heading = headingDegrees;
+  *heading = a - compassOffset;
     
-//    *heading = compassOffset - *heading;
 }
 
 void setCompassOffset()
 {
-    getCompass(&compassOffset);
+    // getCompass(&compassOffset);
+    compass.read();
+
+  int a = compass.getAzimuth();
+
+  if (a < 0){
+    a = 360 + a;  
+  }
+
+  compassOffset = a;
 }
