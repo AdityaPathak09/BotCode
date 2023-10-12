@@ -7,22 +7,25 @@
 #define servobc 5
 #define servoCam 6
 
-#define motorPinlf 13 // pins 2, 4
+#define motorPinlf 13 
 #define motorPinlb 14
 #define motorPinrf 27
 #define motorPinrb 26
+
 #define servoPinBackE 25
 #define servoPinBackC 33
+
 #define servoPincam 15
+
 #define pump1 5
 #define pump2 18
 
-#define servoMinDS 6  //102 //6
-#define servoMaxDS 32  //512 //32
+#define servoMinDS 6  
+#define servoMaxDS 32  
 #define freq 50
 #define resMotor 8
-#define resServo 8   //12 //8
-#define offset 100 // only for actuator
+#define resServo 8   
+#define offset 100 
 #define offsetspeed 175
 
 void forward(int speed) // speed between [0, 255]
@@ -33,7 +36,7 @@ void forward(int speed) // speed between [0, 255]
   ledcWrite(motorrb, 0);
 }
 
-void backard(int speed)
+void backard(int speed) // speed between [0, 255]
 {
   ledcWrite(motorlf, 0);
   ledcWrite(motorrf, 0);
@@ -41,7 +44,7 @@ void backard(int speed)
   ledcWrite(motorrb, speed);
 }
 
-void leftTurn(int speed)
+void leftTurn(int speed) // speed between [0, 255]
 {
   ledcWrite(motorlf, 0);
   ledcWrite(motorrf, speed);
@@ -49,7 +52,7 @@ void leftTurn(int speed)
   ledcWrite(motorrb, 0);
 }
 
-void rightTurn(int speed)
+void rightTurn(int speed) // speed between [0, 255]
 {
   ledcWrite(motorlf, speed);
   ledcWrite(motorrf, 0);
@@ -57,7 +60,7 @@ void rightTurn(int speed)
   ledcWrite(motorrb, 0);
 }
 
-void leftSpin(int speed)
+void leftSpin(int speed) // speed between [0, 255]
 {
   ledcWrite(motorlf, 0);
   ledcWrite(motorrf, speed);
@@ -65,7 +68,7 @@ void leftSpin(int speed)
   ledcWrite(motorrb, 0);
 }
 
-void rightSpin(int speed)
+void rightSpin(int speed) // speed between [0, 255]
 {
   ledcWrite(motorlf, speed);
   ledcWrite(motorrf, 0);
@@ -81,32 +84,33 @@ void stopMotors()
   ledcWrite(motorrb, 0);
 }
 
-void setCam(int angle)
+void setCam(int angle) // angle input between [0, 255], function maps it to [0, 180]
 {
   angle = map(angle, 0, 180, servoMinDS, servoMaxDS);
   ledcWrite(servoCam, angle);
   delay(15);
 }
 
-void setSprayerCentreHeight(int height)
+void setSprayerCentreHeight(int height) // height input between [0, 255], function maps it to [0, 180]
 {
   height = map(height, 0, 180, servoMinDS, servoMaxDS);
   ledcWrite(servobc, height); 
   delay(15);
 }
 
-void setSprayerEdgeHeight(int height)
+void setSprayerEdgeHeight(int height) // height input between [0, 255], function maps it to [0, 180]
 {
   height = map(height, 0, 180, servoMinDS, servoMaxDS);
   ledcWrite(servobe, height);
   delay(15);
 }
 
-void setPump(int pump, boolean state)
+void setPump(int pump, boolean state) // set pump p (pump1, pump2) to state s (on, off)
 {
   digitalWrite(pump, state);
 }
 
+// setup
 void setMotors()
 {
   pinMode(motorPinlf, OUTPUT);

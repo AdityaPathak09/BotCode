@@ -17,6 +17,7 @@ void getCompass(float *heading)
 
   int a = compass.getAzimuth();
 
+  // converting negetive values to positive (-180, 180) -> (0, 360)
   if (a < 0){
     a = 360 + a;  
   }

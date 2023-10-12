@@ -6,16 +6,19 @@
 
 SoftwareSerial gsmSerial(gsmRX, gsmTX);
 
-void updateSerial()
+// just prints whatever available on software serial to serial monitor and vise-versa
+void updateSerial() 
 {
     
   while (Serial.available()) 
   {
-    gsmSerial.write(Serial.read());//Forward what Serial received to Software Serial Port
+    gsmSerial.write(Serial.read());
+    //Forward what Serial received to Software Serial Port
   }
   while(gsmSerial.available()) 
   {
-    Serial.write(gsmSerial.read());//Forward what Software Serial received to Serial Port
+    Serial.write(gsmSerial.read());
+    //Forward what Software Serial received to Serial Port
   }
   delay(100);
 }
