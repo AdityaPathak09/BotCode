@@ -45,13 +45,17 @@ Pin configuration:
 		SCL 22
 		SDA 21
 
-Here is a simple flow chart:
+Sequence Diagram
 
 ```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
+Alice->>John: Hello John, how are you?
+loop Healthcheck
+    John->>John: Fight against hypochondria
+end
+Note right of John: Rational thoughts!
+John-->>Alice: Great!
+John->>Bob: How about you?
+Bob-->>John: Jolly good!
+
 ```
 
