@@ -19,8 +19,8 @@ BluetoothSerial bluetooth;
 #include "gsm.h"
 
 // All variables //////////////////////////////////////////////////////////////////
-float latitude;
-float longitude;
+double latitude;
+double longitude;
 String gpsData;
 float compassHead;
 
@@ -57,13 +57,13 @@ void sendGpsData() {
 
   getCompass(&compassHead);      // getting Compass
 
-  // Serial.println("Latitude: " + String(latitude) + " Longitude: " + String(longitude)+ " Comass: " + String(compassHead));
+  Serial.println("Latitude: " + String(latitude) + " Longitude: " + String(longitude)+ " Compass: " + String(compassHead));
 
 
   // converting Data to non-decimal form 
 
-  long lat = long(latitude * 10000000.0);  
-  long lon = long(longitude * 10000000.0);
+  long lat = long(latitude);  
+  long lon = long(longitude);
   long compH = long(compassHead * 100.0);
 
 
@@ -215,6 +215,10 @@ byte getInstruction() {
 
         break;
 
+      case 19:                      // Set Compass Offset
+        setCompassOffset();
+        break;
+
       default:                       // for any other instruction, stop all motors
         instruction = 0;
         stopMotors();
@@ -253,7 +257,7 @@ void setup() {
 
   // setting  peripherals (Sensors, Drivers)
   setMotors();
-  setGPS();
+  setGPS(&latitude, &longitude);
   setCompass();
   setGSM();
 }

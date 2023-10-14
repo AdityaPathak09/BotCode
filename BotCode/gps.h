@@ -3,29 +3,26 @@
 // Same can be applied for GSM Module
 
 #include <SoftwareSerial.h>
+#include <TinyGPSPlus.h>
 
-#include <TinyGPS.h>
+#define gpsRX 34  // Sensor's TX, microcontroller's RX
+#define gpsTX 4   // Sensor's RX, microcontroller's TX
 
-#define gpsRX 34 // Sensor's TX, microcontroller's RX
-#define gpsTX 4  // Sensor's RX, microcontroller's TX
-
-TinyGPS gps;
+TinyGPSPlus gps;
 SoftwareSerial gpsSerial(gpsRX, gpsTX);
 
-String getGps(float *latitude, float *longitude)
-{
+String getGps(double *latitude, double *longitude) {
   unsigned long age;
   String string;
   while (gpsSerial.available())
     string = string + gps.encode(gpsSerial.read());
 
-  gps.f_get_position(latitude, longitude, &age);
-
-  if (*latitude != TinyGPS::GPS_INVALID_F_ANGLE && *longitude != TinyGPS::GPS_INVALID_F_ANGLE && age != TinyGPS::GPS_INVALID_AGE)
-    string = String(*latitude, 7) + "," + String(*longitude, 7);
-
-  else
-  {
+  if (gps.location.isValid()) {
+    *latitude = gps.location.lat() * 10000000.0;
+    *longitude = gps.location.lng() * 10000000.0;
+    // Serial.print(*latitude, 6);
+    // Serial.println(*longitude, 6);
+  } else {
     string = "Invalid Data";
     *latitude = 0;
     *longitude = 0;
@@ -34,8 +31,24 @@ String getGps(float *latitude, float *longitude)
   return string;
 }
 
-void setGPS()
-{
+void setGPS(double *latitude, double *longitude) {
   gpsSerial.begin(9600);
+
+  long fixstarttime = millis();
+
+  while (*latitude == 0 || *longitude == 0) {
+    while (gpsSerial.available())
+      gps.encode(gpsSerial.read());
+    if (gps.location.isValid()) {
+      *latitude = gps.location.lat() * 10000000.0;
+      *longitude = gps.location.lng() * 10000000.0;
+      // Serial.print(*latitude, 6);
+      // Serial.println(*longitude, 6);
+    }
+    Serial.println("Finding Fix");
+    if (millis() - fixstarttime >= 7000)
+      break;
+  }
+
   Serial.println("GPS Set");
 }

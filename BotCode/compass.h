@@ -1,12 +1,17 @@
 #include <QMC5883LCompass.h>
+#include <EEPROM.h>
+
+#define EEPROM_SIZE 2
 
 QMC5883LCompass compass;
 
-float compassOffset = 0;
+int compassOffset = 0;
 
 void setCompass()
 {
   compass.init();
+  EEPROM.begin(EEPROM_SIZE);
+  compassOffset = EEPROM.read(0);
   Serial.println("Compass Set");
 }
 
@@ -22,7 +27,7 @@ void getCompass(float *heading)
     a = 360 + a;  
   }
 
-  *heading = a - compassOffset;
+  *heading = 360 - (a - compassOffset);
     
 }
 
@@ -38,4 +43,7 @@ void setCompassOffset()
   }
 
   compassOffset = a;
+  EEPROM.write(0, compassOffset);
+  EEPROM.commit();
+  Serial.println("New Offset: " +String(compassOffset));
 }
