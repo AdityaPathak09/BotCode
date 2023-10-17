@@ -34,21 +34,21 @@ String getGps(double *latitude, double *longitude) {
 void setGPS(double *latitude, double *longitude) {
   gpsSerial.begin(9600);
 
-  long fixstarttime = millis();
+  // long fixstarttime = millis();
 
-  while (*latitude == 0 || *longitude == 0) {
-    while (gpsSerial.available())
-      gps.encode(gpsSerial.read());
-    if (gps.location.isValid()) {
-      *latitude = gps.location.lat() * 10000000.0;
-      *longitude = gps.location.lng() * 10000000.0;
-      // Serial.print(*latitude, 6);
-      // Serial.println(*longitude, 6);
-    }
-    Serial.println("Finding Fix");
-    if (millis() - fixstarttime >= 7000)
-      break;
-  }
+  // while (*latitude == 0 || *longitude == 0) {
+  //   while (gpsSerial.available())
+  //     gps.encode(gpsSerial.read());
+  //   if (gps.location.isValid()) {
+  //     *latitude = gps.location.lat() * 10000000.0;
+  //     *longitude = gps.location.lng() * 10000000.0;
+  //     // Serial.print(*latitude, 6);
+  //     // Serial.println(*longitude, 6);
+  //   }
+  //   Serial.println("Finding Fix");
+  //   if (millis() - fixstarttime >= 7000)
+  //     break;
+  // }
 
   Serial.println("GPS Set");
 }
